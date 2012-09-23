@@ -3,6 +3,10 @@ package collada
 import (
 	"encoding/xml"
 	"io/ioutil"
+	"errors"
+	"strings"
+	"strconv"
+	"fmt"
 )
 
 // ColladaData contains raw data parsed from collada xml. No work has yet been
@@ -18,27 +22,41 @@ type ColladaData struct {
 }
 
 // Check if parsed file contains right toplevel name.
-func (c *ColladaData) isCollada() bool {
-	return c.XMLName.Local == "COLLADA"
-}
+func (c *ColladaData) isCollada() bool { return c.XMLName.Local == "COLLADA" }
 
 // See p.82 in collada spec.
 type GeometryData struct {
-	Id   string   `xml:"id,attr"`
-	Name string   `xml:"name,attr"`
-	Mesh MeshData `xml:"mesh"`
+	Id   string    `xml:"id,attr"`
+	Name string    `xml:"name,attr"`
+	Mesh *MeshData `xml:"mesh"`
 }
 
 // See p.129 in collada spec.
 type MeshData struct {
-	Vertices  VertexData   `xml:"vertices"`
-	Triangles TriangleData `xml:"triangles"`
-	Sources   []SourceData `xml:"source"`
+	Vertices  *VertexData   `xml:"vertices"`
+	Triangles *TriangleData `xml:"triangles"`
+	Sources   []SourceData  `xml:"source"`
+}
+
+func (m *MeshData) vertexFloats() ([]float64, error) {
+	sourceId := m.Vertices.Input.Source
+	if len(sourceId) == 0 {
+		return nil, &InvalidColladaId{sourceId}
+	}
+
+	cleanId := sourceId[1:] // Strip leading hash
+	for _, src := range m.Sources {
+		if src.Id == cleanId {
+			return src.extractFloats()
+		}
+	}
+
+	return nil, &InvalidColladaId{sourceId}
 }
 
 // See p.196 in collada spec.
 type VertexData struct {
-	Input InputData `xml:"input"`
+	Input *InputData `xml:"input"`
 }
 
 // See p.188 in collada spec.
@@ -57,13 +75,37 @@ type InputData struct {
 
 // See p.177 in collada spec.
 type SourceData struct {
-	Id       string         `xml:"id,attr"`
-	Name     string         `xml:"name,attr"`
-	FloatArr FloatArrayData `xml:"float_array"`
+	Id       string          `xml:"id,attr"`
+	Name     string          `xml:"name,attr"`
+	FloatArr *FloatArrayData `xml:"float_array"`
 	// In xml Accessor is inside 'technique_common' element, but here we drop
 	// that indirection because in source section there can be only 'accessor'
 	// element.
 	Accessor AccessorData `xml:"technique_common>accessor"`
+}
+
+func (s *SourceData) extractFloats() ([]float64, error) {
+	if s.FloatArr == nil {
+		return nil, errors.New("SourceData '" + s.Id + "' doesn't contain FloatArray")
+	}
+
+	retval := make([]float64, 0)
+	floatStrs := strings.Split(s.FloatArr.Data, " ")
+	for _, fstr := range floatStrs {
+		fl, err := strconv.ParseFloat(fstr, 32)
+		if err != nil {
+			return nil, err
+		}
+		retval = append(retval, fl)
+	}
+
+	if len(retval) != s.FloatArr.Count {
+		errStr := fmt.Sprint("Parsed only %d elements from #%s. %d was required",
+			len(retval), s.FloatArr.Id, s.FloatArr.Count)
+		return nil, errors.New(errStr)
+	}
+
+	return retval, nil
 }
 
 // See p.188 and p.77 in collada spec.

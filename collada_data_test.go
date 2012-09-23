@@ -115,3 +115,44 @@ func (s *ColladaDataSuite) TestMeshSourceFloatArray(c *C) {
 	c.Check(arr.Count, Equals, 24)
 	c.Check(arr.Data, Equals, "-50 50 50 50 50 50 -50 -50 50 50 -50 50 -50 50 -50 50 50 -50 -50 -50 -50 50 -50 -50")
 }
+
+func (s *ColladaDataSuite) TestSourceFloatExtract(c *C) {
+	srcData := s.data.Geometries[0].Mesh.Sources[0]
+	expected := []float64{-50, 50, 50, 50, 50, 50, -50, -50, 50, 50, -50, 50, -50, 50, -50, 50, 50, -50, -50, -50, -50, 50, -50, -50}
+	actual, _ := srcData.extractFloats()
+
+	c.Check(actual, DeepEquals, expected)
+}
+
+func (s *ColladaDataSuite) TestSourceFloatExtractErrors(c *C) {
+	srcData := s.data.Geometries[0].Mesh.Sources[0]
+	srcData.FloatArr = nil
+	_, err := srcData.extractFloats()
+
+	c.Check(err, NotNil)
+}
+
+func (s *ColladaDataSuite) TestMeshVertexFloats(c *C) {
+	meshData := s.data.Geometries[0].Mesh
+	expected := []float64{-50, 50, 50, 50, 50, 50, -50, -50, 50, 50, -50, 50, -50, 50, -50, 50, 50, -50, -50, -50, -50, 50, -50, -50}
+	actual, _ := meshData.vertexFloats()
+
+	c.Check(actual, DeepEquals, expected)
+}
+
+func (s *ColladaDataSuite) TestMeshVertexFloatsErrors(c *C) {
+	meshData := s.data.Geometries[0].Mesh
+	input := meshData.Vertices.Input
+	var err error
+	var expected InvalidColladaId
+
+	input.Source = ""
+	_, err = meshData.vertexFloats()
+	expected = InvalidColladaId{input.Source}
+	c.Check(err.Error(), Equals, expected.Error())
+
+	input.Source = "bogus"
+	_, err = meshData.vertexFloats()
+	expected = InvalidColladaId{input.Source}
+	c.Check(err.Error(), Equals, expected.Error())
+}
