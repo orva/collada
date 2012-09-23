@@ -5,5 +5,4 @@ import (
 	"testing"
 )
 
-func Test(t *testing.T ) { TestingT(t)  } 
-
+func Test(t *testing.T) { TestingT(t) }

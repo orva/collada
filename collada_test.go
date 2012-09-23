@@ -4,9 +4,6 @@ import (
 	. "launchpad.net/gocheck"
 )
 
-type ColladaSuite struct{} 
-var _ = Suite(&ColladaSuite{})
+type ColladaSuite struct{}
 
-func (s *ColladaSuite) TestNothing(c *C) {
-	c.Check(true, Equals, true)
-}
+var _ = Suite(&ColladaSuite{})
