@@ -29,7 +29,13 @@ func newMesh(m *MeshData, id, name string) (*Mesh, error) {
 }
 
 func (m *MeshData) triangles() ([]Vertex, error) {
-	vertices, _ := m.vertices()
+	var err error
+
+	vertices, err := m.vertices()
+	if err != nil {
+		return nil, err
+	}
+
 	primitives, err := m.Triangles.primitives()
 	if err != nil {
 		return nil, err
