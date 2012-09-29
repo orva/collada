@@ -40,18 +40,37 @@ type MeshData struct {
 
 func (m *MeshData) vertexFloats() ([]float64, error) {
 	sourceId := m.Vertices.Input.Source
-	if len(sourceId) == 0 {
-		return nil, &InvalidColladaId{sourceId}
+	src, err := m.source(sourceId)
+	if err != nil {
+		return nil, err
 	}
 
-	cleanId := sourceId[1:] // Strip leading hash
+	return src.extractFloats()
+}
+
+func (m *MeshData) vertexAccessor() (*AccessorData, error) {
+	sourceId := m.Vertices.Input.Source
+	src, err := m.source(sourceId)
+	if err != nil {
+		return nil, err
+	}
+
+	return src.Accessor, nil
+}
+
+func (m *MeshData) source(id string) (*SourceData, error) {
+	if len(id) == 0 {
+		return nil, &InvalidColladaId{id}
+	}
+
+	cleanId := id[1:] // Strip leading hash
 	for _, src := range m.Sources {
 		if src.Id == cleanId {
-			return src.extractFloats()
+			return &src, nil
 		}
 	}
 
-	return nil, &InvalidColladaId{sourceId}
+	return nil, &InvalidColladaId{id}
 }
 
 // See p.196 in collada spec.
@@ -81,7 +100,7 @@ type SourceData struct {
 	// In xml Accessor is inside 'technique_common' element, but here we drop
 	// that indirection because in source section there can be only 'accessor'
 	// element.
-	Accessor AccessorData `xml:"technique_common>accessor"`
+	Accessor *AccessorData `xml:"technique_common>accessor"`
 }
 
 func (s *SourceData) extractFloats() ([]float64, error) {
@@ -117,11 +136,21 @@ type FloatArrayData struct {
 
 // See p.45 in collada spec.
 type AccessorData struct {
-	Count  uint        `xml:"count,attr"`
-	Offset uint        `xml:"offset,attr"`
+	Count  int         `xml:"count,attr"`
+	Offset int         `xml:"offset,attr"`
 	Source string      `xml:"source,attr"`
-	Stride uint        `xml:"stride,attr"`
+	Stride int         `xml:"stride,attr"`
 	Params []ParamData `xml:"param"`
+}
+
+func (a *AccessorData) paramIndex(name string) int {
+	for index, param := range a.Params {
+		if param.Name == name {
+			return index
+		}
+	}
+
+	return -1
 }
 
 // See p.144 in collada spec.

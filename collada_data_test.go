@@ -73,16 +73,16 @@ func (s *ColladaDataSuite) TestMeshSourceAccessor(c *C) {
 	a0 := s.data.Geometries[0].Mesh.Sources[0].Accessor
 	a1 := s.data.Geometries[0].Mesh.Sources[1].Accessor
 
-	c.Check(a0.Count, Equals, uint(8))
-	c.Check(a0.Offset, Equals, uint(0))
+	c.Check(a0.Count, Equals, 8)
+	c.Check(a0.Offset, Equals, 0)
 	c.Check(a0.Source, Equals, "#box-lib-positions-array")
-	c.Check(a0.Stride, Equals, uint(3))
+	c.Check(a0.Stride, Equals, 3)
 	c.Assert(len(a0.Params), Equals, 3)
 
-	c.Check(a1.Count, Equals, uint(24))
-	c.Check(a1.Offset, Equals, uint(0))
+	c.Check(a1.Count, Equals, 24)
+	c.Check(a1.Offset, Equals, 0)
 	c.Check(a1.Source, Equals, "#box-lib-normals-array")
-	c.Check(a1.Stride, Equals, uint(3))
+	c.Check(a1.Stride, Equals, 3)
 	c.Check(len(a1.Params), Equals, 3)
 }
 
@@ -121,6 +121,7 @@ func (s *ColladaDataSuite) TestSourceFloatExtract(c *C) {
 	expected := []float64{-50, 50, 50, 50, 50, 50, -50, -50, 50, 50, -50, 50, -50, 50, -50, 50, 50, -50, -50, -50, -50, 50, -50, -50}
 	actual, _ := srcData.extractFloats()
 
+	c.Check(len(actual), Equals, 24)
 	c.Check(actual, DeepEquals, expected)
 }
 
