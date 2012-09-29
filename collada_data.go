@@ -85,6 +85,29 @@ type TriangleData struct {
 	P      string      `xml:"p"`
 }
 
+func (t *TriangleData) primitives() ([]int, error) {
+	intStrs := strings.Split(t.P, " ")
+	retval := make([]int, 0)
+	for _, raw := range intStrs {
+		primitive, err := strconv.Atoi(raw)
+		if err != nil {
+			return nil, err
+		}
+		retval = append(retval, primitive)
+	}
+	return retval, nil
+}
+
+func (t *TriangleData) semantic(semantic string) int {
+	for index, input := range t.Inputs {
+		if input.Semantic == semantic {
+			return index
+		}
+	}
+
+	return -1
+}
+
 // See p.87 in collada spec.
 type InputData struct {
 	Semantic string `xml:"semantic,attr"`

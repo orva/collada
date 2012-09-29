@@ -11,6 +11,10 @@ type Vertex struct {
 }
 
 type Mesh struct {
+	// Contains vertices which you can use to draw triangles. At this point no
+	// tristrips or trifans are implemented.
+	// TODO Implement tristrips and trifans
+	// TODO Normals
 	Vertices []Vertex
 	Id       string
 	Name     string
@@ -22,6 +26,30 @@ func newMesh(m *MeshData, id, name string) (*Mesh, error) {
 	}
 
 	return nil, errors.New("Not implemented")
+}
+
+func (m *MeshData) triangles() ([]Vertex, error) {
+	vertices, _ := m.vertices()
+	primitives, err := m.Triangles.primitives()
+	if err != nil {
+		return nil, err
+	}
+
+	vertOffset := m.Triangles.semantic("VERTEX")
+	retval := make([]Vertex, 0)
+	baseIndex := 0
+	stride := len(m.Triangles.Inputs)
+	for count := 0; count < m.Triangles.Count; count++ {
+		// There should always be valid amount of indices, crash and burn if
+		// there isn't
+
+		// Fetch right vertex with index from primitives array.
+		vertex := vertices[primitives[baseIndex+vertOffset]]
+		retval = append(retval, vertex)
+		baseIndex += stride
+	}
+
+	return retval, nil
 }
 
 // Apply SourceData.Accessor to SourceData.FloatArray to get vertices.

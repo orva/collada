@@ -52,6 +52,13 @@ func (s *ColladaDataSuite) TestTriangleData(c *C) {
 	c.Check(triangles.P, Equals, "0 0 2 1 3 2 0 0 3 2 1 3 0 4 1 5 5 6 0 4 5 6 4 7 6 8 7 9 3 10 6 8 3 10 2 11 0 12 4 13 6 14 0 12 6 14 2 15 3 16 7 17 5 18 3 16 5 18 1 19 5 20 7 21 6 22 5 20 6 22 4 23")
 }
 
+func (s *ColladaDataSuite) TestTriangleDataPrimitives(c *C) {
+	primitives, _ := s.data.Geometries[0].Mesh.Triangles.primitives()
+	expected :=
+		[]int{0, 0, 2, 1, 3, 2, 0, 0, 3, 2, 1, 3, 0, 4, 1, 5, 5, 6, 0, 4, 5, 6, 4, 7, 6, 8, 7, 9, 3, 10, 6, 8, 3, 10, 2, 11, 0, 12, 4, 13, 6, 14, 0, 12, 6, 14, 2, 15, 3, 16, 7, 17, 5, 18, 3, 16, 5, 18, 1, 19, 5, 20, 7, 21, 6, 22, 5, 20, 6, 22, 4, 23}
+	c.Check(primitives, DeepEquals, expected)
+}
+
 func (s *ColladaDataSuite) TestVertexData(c *C) {
 	vertices := s.data.Geometries[0].Mesh.Vertices
 	c.Check(vertices.Input.Semantic, Equals, "POSITION")

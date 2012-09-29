@@ -23,3 +23,8 @@ func (s *ColladaSuite) TestGettingVertices(c *C) {
 	actual, _ := s.data.Geometries[0].Mesh.vertices()
 	c.Check(len(actual), Equals, 8)
 }
+
+func (s *ColladaSuite) TestGettingTriangles(c *C) {
+	actual, _ := s.data.Geometries[0].Mesh.triangles()
+	c.Check(len(actual), Equals, 12)
+}
