@@ -6,23 +6,34 @@ import (
 
 type ColladaSuite struct {
 	data *ColladaData
+	mesh *Mesh
 }
+
+const (
+	NAME = "mesh name"
+	ID   = "mesh id"
+)
 
 var _ = Suite(&ColladaSuite{})
 
 func (s *ColladaSuite) SetUpTest(c *C) {
 	s.data, _ = ParseColladaData("test-data/cube_triangulate.dae")
+	s.mesh, _ = NewMesh(s.data.Geometries[0].Mesh, ID, NAME)
 }
 
-func (s *ColladaSuite) TestNewMesh(c *C) {
-	mesh, _ := NewMesh(s.data.Geometries[0].Mesh, "id", "name")
-	expectedMesh, _ := s.data.Geometries[0].Mesh.vertices()
-	c.Check(mesh.Vertices, DeepEquals, expectedMesh)
+func (s *ColladaSuite) TestNewMeshAttributes(c *C) {
+	c.Check(s.mesh.Id, Equals, ID)
+	c.Check(s.mesh.Name, Equals, NAME)
+}
 
-	expectedPrimitives, _ := s.data.Geometries[0].Mesh.Triangles.primitives()
-	c.Check(mesh.VertexPrimitives, DeepEquals, expectedPrimitives)
-	c.Check(mesh.Id, Equals, "id")
-	c.Check(mesh.Name, Equals, "name")
+func (s *ColladaSuite) TestNewMeshVertices(c *C) {
+	expectedMesh, _ := s.data.Geometries[0].Mesh.vertices()
+	c.Check(s.mesh.Vertices, DeepEquals, expectedMesh)
+}
+
+func (s *ColladaSuite) TestNewMeshPrimitives(c *C) {
+	expected, _ := s.data.Geometries[0].Mesh.Triangles.primitives()
+	c.Check(s.mesh.VertexPrimitives, DeepEquals, expected)
 }
 
 func (s *ColladaSuite) TestGettingVertices(c *C) {
