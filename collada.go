@@ -20,15 +20,26 @@ type Mesh struct {
 	Name     string
 }
 
-func newMesh(m *MeshData, id, name string) (*Mesh, error) {
+// Create single triangulated Mesh from given MeshData
+func NewMesh(m *MeshData, id, name string) (*Mesh, error) {
+	triangles, err := m.triangles()
+	if err != nil {
+		return nil, err
+	}
+
+	mesh := &Mesh{
+		Vertices: triangles,
+		Id:       id,
+		Name:     name,
+	}
+	return mesh, nil
+}
+
+func (m *MeshData) triangles() ([]Vertex, error) {
 	if m.Triangles == nil {
 		return nil, errors.New("Mesh is not triangulated")
 	}
 
-	return nil, errors.New("Not implemented")
-}
-
-func (m *MeshData) triangles() ([]Vertex, error) {
 	var err error
 
 	vertices, err := m.vertices()

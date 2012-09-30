@@ -11,7 +11,7 @@ type ColladaDataSuite struct {
 var _ = Suite(&ColladaDataSuite{})
 
 func (s *ColladaDataSuite) SetUpTest(c *C) {
-	s.data, _ = parseColladaData("test-data/cube_triangulate.dae")
+	s.data, _ = ParseColladaData("test-data/cube_triangulate.dae")
 }
 
 func (s *ColladaDataSuite) TestXMLName(c *C) {
@@ -21,7 +21,7 @@ func (s *ColladaDataSuite) TestXMLName(c *C) {
 }
 
 func (s *ColladaDataSuite) TestThatFileNeedsToBeColladaFile(c *C) {
-	_, err := parseColladaData("test-data/invalid_top_level.dae")
+	_, err := ParseColladaData("test-data/invalid_top_level.dae")
 	c.Assert(err, NotNil)
 	tmp := &NotValidColladaFileError{}
 	c.Assert(err.Error(), Equals, tmp.Error())

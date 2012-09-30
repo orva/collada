@@ -182,7 +182,7 @@ type ParamData struct {
 	Type string `xml:"type,attr"`
 }
 
-func parseColladaData(path string) (*ColladaData, error) {
+func ParseColladaData(path string) (*ColladaData, error) {
 	xmlFile, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err

@@ -11,12 +11,15 @@ type ColladaSuite struct {
 var _ = Suite(&ColladaSuite{})
 
 func (s *ColladaSuite) SetUpTest(c *C) {
-	s.data, _ = parseColladaData("test-data/cube_triangulate.dae")
+	s.data, _ = ParseColladaData("test-data/cube_triangulate.dae")
 }
 
 func (s *ColladaSuite) TestNewMesh(c *C) {
-	_, err := newMesh(s.data.Geometries[0].Mesh, "", "")
-	c.Check(err.Error(), Equals, "Not implemented")
+	mesh, _:= NewMesh(s.data.Geometries[0].Mesh, "id", "name")
+	expected, _ := s.data.Geometries[0].Mesh.triangles()
+	c.Check(mesh.Vertices, DeepEquals, expected)
+	c.Check(mesh.Id, Equals, "id")
+	c.Check(mesh.Name, Equals, "name")
 }
 
 func (s *ColladaSuite) TestGettingVertices(c *C) {
