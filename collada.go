@@ -11,26 +11,36 @@ type Vertex struct {
 }
 
 type Mesh struct {
-	// Contains vertices which you can use to draw triangles. At this point no
-	// tristrips or trifans are implemented.
 	// TODO Implement tristrips and trifans
 	// TODO Normals
+	// Contains vertices, but not all of them. You need to use VertexPrimitives
+	// to build actual triangles.
 	Vertices []Vertex
-	Id       string
-	Name     string
+	// Contains indexes to vertices
+	VertexPrimitives []int
+	Id               string
+	Name             string
 }
 
 // Create single triangulated Mesh from given MeshData
 func NewMesh(m *MeshData, id, name string) (*Mesh, error) {
-	triangles, err := m.triangles()
+	var err error
+
+	vertices, err := m.vertices()
+	if err != nil {
+		return nil, err
+	}
+
+	primitives, err := m.Triangles.primitives()
 	if err != nil {
 		return nil, err
 	}
 
 	mesh := &Mesh{
-		Vertices: triangles,
-		Id:       id,
-		Name:     name,
+		Vertices:         vertices,
+		VertexPrimitives: primitives,
+		Id:               id,
+		Name:             name,
 	}
 	return mesh, nil
 }
