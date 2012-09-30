@@ -32,16 +32,12 @@ func (s *ColladaSuite) TestNewMeshVertices(c *C) {
 }
 
 func (s *ColladaSuite) TestNewMeshPrimitives(c *C) {
-	expected, _ := s.data.Geometries[0].Mesh.Triangles.primitives()
+	expected := []int{0, 2, 3, 0, 3, 1, 0, 1, 5, 0, 5, 4, 6, 7, 3, 6, 3, 2, 0,
+		4, 6, 0, 6, 2, 3, 7, 5, 3, 5, 1, 5, 7, 6, 5, 6, 4}
 	c.Check(s.mesh.VertexPrimitives, DeepEquals, expected)
 }
 
 func (s *ColladaSuite) TestGettingVertices(c *C) {
 	actual, _ := s.data.Geometries[0].Mesh.vertices()
 	c.Check(len(actual), Equals, 8)
-}
-
-func (s *ColladaSuite) TestGettingTriangles(c *C) {
-	actual, _ := s.data.Geometries[0].Mesh.triangles()
-	c.Check(len(actual), Equals, 12)
 }

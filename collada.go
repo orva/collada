@@ -13,8 +13,8 @@ type Vertex struct {
 type Mesh struct {
 	// TODO Implement tristrips and trifans
 	// TODO Normals
-	// Contains vertices, but not all of them. You need to use VertexPrimitives
-	// to build actual triangles.
+	// Contains vertices. You need to use VertexPrimitives to build actual
+	// triangles.
 	Vertices []Vertex
 	// Contains indexes to vertices
 	VertexPrimitives []int
@@ -31,7 +31,7 @@ func NewMesh(m *MeshData, id, name string) (*Mesh, error) {
 		return nil, err
 	}
 
-	primitives, err := m.Triangles.primitives()
+	primitives, err := m.vertexPrimitives()
 	if err != nil {
 		return nil, err
 	}
@@ -45,16 +45,9 @@ func NewMesh(m *MeshData, id, name string) (*Mesh, error) {
 	return mesh, nil
 }
 
-func (m *MeshData) triangles() ([]Vertex, error) {
+func (m *MeshData) vertexPrimitives() ([]int, error) {
 	if m.Triangles == nil {
 		return nil, errors.New("Mesh is not triangulated")
-	}
-
-	var err error
-
-	vertices, err := m.vertices()
-	if err != nil {
-		return nil, err
 	}
 
 	primitives, err := m.Triangles.primitives()
@@ -63,17 +56,20 @@ func (m *MeshData) triangles() ([]Vertex, error) {
 	}
 
 	vertOffset := m.Triangles.semantic("VERTEX")
-	retval := make([]Vertex, 0)
+	retval := make([]int, 0)
 	baseIndex := 0
 	stride := len(m.Triangles.Inputs)
-	for count := 0; count < m.Triangles.Count; count++ {
+	for {
 		// There should always be valid amount of indices, crash and burn if
 		// there isn't
-
+		//
 		// Fetch right vertex with index from primitives array.
-		vertex := vertices[primitives[baseIndex+vertOffset]]
-		retval = append(retval, vertex)
+		prim := primitives[baseIndex+vertOffset]
+		retval = append(retval, prim)
 		baseIndex += stride
+		if baseIndex >= len(primitives) {
+			break
+		}
 	}
 
 	return retval, nil
