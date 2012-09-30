@@ -38,7 +38,7 @@ type MeshData struct {
 	Sources   []SourceData  `xml:"source"`
 }
 
-func (m *MeshData) vertexFloats() ([]float64, error) {
+func (m *MeshData) vertexFloats() ([]float32, error) {
 	sourceId := m.Vertices.Input.Source
 	src, err := m.source(sourceId)
 	if err != nil {
@@ -126,19 +126,21 @@ type SourceData struct {
 	Accessor *AccessorData `xml:"technique_common>accessor"`
 }
 
-func (s *SourceData) extractFloats() ([]float64, error) {
+func (s *SourceData) extractFloats() ([]float32, error) {
 	if s.FloatArr == nil {
 		return nil, errors.New("SourceData '" + s.Id + "' doesn't contain FloatArray")
 	}
 
-	retval := make([]float64, 0)
+	retval := make([]float32, 0)
 	floatStrs := strings.Split(s.FloatArr.Data, " ")
 	for _, fstr := range floatStrs {
+		// Parse float32  from string presentation. Note that ParseFloat return
+		// type is actually float64 even though bit presentation is float32.
 		fl, err := strconv.ParseFloat(fstr, 32)
 		if err != nil {
 			return nil, err
 		}
-		retval = append(retval, fl)
+		retval = append(retval, float32(fl))
 	}
 
 	if len(retval) != s.FloatArr.Count {

@@ -125,7 +125,7 @@ func (s *ColladaDataSuite) TestMeshSourceFloatArray(c *C) {
 
 func (s *ColladaDataSuite) TestSourceFloatExtract(c *C) {
 	srcData := s.data.Geometries[0].Mesh.Sources[0]
-	expected := []float64{-50, 50, 50, 50, 50, 50, -50, -50, 50, 50, -50, 50, -50, 50, -50, 50, 50, -50, -50, -50, -50, 50, -50, -50}
+	expected := []float32{-50, 50, 50, 50, 50, 50, -50, -50, 50, 50, -50, 50, -50, 50, -50, 50, 50, -50, -50, -50, -50, 50, -50, -50}
 	actual, _ := srcData.extractFloats()
 
 	c.Check(len(actual), Equals, 24)
@@ -142,7 +142,7 @@ func (s *ColladaDataSuite) TestSourceFloatExtractErrors(c *C) {
 
 func (s *ColladaDataSuite) TestMeshVertexFloats(c *C) {
 	meshData := s.data.Geometries[0].Mesh
-	expected := []float64{-50, 50, 50, 50, 50, 50, -50, -50, 50, 50, -50, 50, -50, 50, -50, 50, 50, -50, -50, -50, -50, 50, -50, -50}
+	expected := []float32{-50, 50, 50, 50, 50, 50, -50, -50, 50, 50, -50, 50, -50, 50, -50, 50, 50, -50, -50, -50, -50, 50, -50, -50}
 	actual, _ := meshData.vertexFloats()
 
 	c.Check(actual, DeepEquals, expected)

@@ -15,7 +15,7 @@ func (s *ColladaSuite) SetUpTest(c *C) {
 }
 
 func (s *ColladaSuite) TestNewMesh(c *C) {
-	mesh, _:= NewMesh(s.data.Geometries[0].Mesh, "id", "name")
+	mesh, _ := NewMesh(s.data.Geometries[0].Mesh, "id", "name")
 	expected, _ := s.data.Geometries[0].Mesh.triangles()
 	c.Check(mesh.Vertices, DeepEquals, expected)
 	c.Check(mesh.Id, Equals, "id")

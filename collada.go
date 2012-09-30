@@ -5,9 +5,9 @@ import (
 )
 
 type Vertex struct {
-	X float64
-	Y float64
-	Z float64
+	X float32
+	Y float32
+	Z float32
 }
 
 type Mesh struct {
